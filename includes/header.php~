@@ -10,7 +10,7 @@ $menuItems = [
         <ul>
             <?php foreach ($menuItems as $title => $url): ?>
                 <li>
-                    <a href="<?= $url ?>" <?= ($_SERVER['REQUEST_URI'] == $url) ? 'class="active"' : '' ?>>
+                    <a href="<?= $url ?>" <?= $_SERVER['REQUEST_URI'] == $url ? 'class="active"' : '' ?>>
                         <?= htmlspecialchars($title) ?>
                     </a>
                 </li>
