@@ -13,3 +13,10 @@ Thumbs.db
 
 uploads/
 temp/
+.env
+.env.local
+.env.*.local
+vendor/
+composer.lock
+*.log
+cache/
