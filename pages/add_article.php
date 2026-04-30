@@ -7,12 +7,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $content = trim($_POST['content'] ?? '');
     if ($title && $content) {
-        $pdo = getDbConnection();
-        $stmt = $pdo->prepare("INSERT INTO articles (title, content) VALUES (?, ?)");
-        if ($stmt->execute([$title, $content])) {
-            $message = '<p style="color:green;">Статья добавлена!</p>';
-        } else {
-            $message = '<p style="color:red;">Ошибка добавления.</p>';
+        try {
+            $pdo = getDbConnection();
+            $stmt = $pdo->prepare("INSERT INTO articles (title, content) VALUES (?, ?)");
+            if ($stmt->execute([$title, $content])) {
+                $message = '<p style="color:green;">Статья добавлена!</p>';
+            } else {
+                $message = '<p style="color:red;">Ошибка добавления.</p>';
+            }
+        } catch (PDOException $e) {
+            $message = '<p style="color:red;">Ошибка БД: ' . htmlspecialchars($e->getMessage()) . '</p>';
         }
     } else {
         $message = '<p style="color:red;">Заполните все поля.</p>';
