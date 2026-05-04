@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Генератор советов</title>
+    <style>
+        body { font-family: system-ui; max-width: 600px; margin: auto; padding: 2rem; }
+        button { padding: 10px 20px; }
+        .advice { background: #f0f0f0; padding: 1rem; border-radius: 10px; margin: 1rem 0; }
+        .saved { margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <h1> Генератор советов</h1>
+    <button id="getAdvice">Получить совет</button>
+    <div class="advice" id="advice"></div>
+    <button id="saveAdvice" style="display:none;"> Сохранить совет</button>
+    <div class="saved">
+        <h2>Сохранённые советы</h2>
+        <ul id="savedList"></ul>
+        <button id="clearSaved">Очистить всё</button>
+    </div>
+
+    <script>
+        let currentAdvice = null;
+        const adviceDiv = document.getElementById('advice');
+        const saveBtn = document.getElementById('saveAdvice');
+        const savedList = document.getElementById('savedList');
+        const clearBtn = document.getElementById('clearSaved');
+
+        function loadSaved() {
+            const saved = JSON.parse(localStorage.getItem('savedAdvice') || '[]');
+            savedList.innerHTML = saved.map((text, idx) => `<li>${text} <button data-idx="${idx}">🗑️</button></li>`).join('');
+            document.querySelectorAll('#savedList button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = btn.dataset.idx;
+                    let arr = JSON.parse(localStorage.getItem('savedAdvice') || '[]');
+                    arr.splice(idx, 1);
+                    localStorage.setItem('savedAdvice', JSON.stringify(arr));
+                    loadSaved();
+                });
+            });
+        }
+
+        document.getElementById('getAdvice').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/proxy.php?url=https://api.adviceslip.com/advice');
+                const data = await res.json();
+                currentAdvice = data.slip.advice;
+                adviceDiv.innerHTML = `<p> ${currentAdvice}</p>`;
+                saveBtn.style.display = 'inline-block';
+            } catch (e) {
+                adviceDiv.innerHTML = `<p style="color:red;">Ошибка: ${e.message}</p>`;
+            }
+        });
+
+        saveBtn.addEventListener('click', () => {
+            if (currentAdvice) {
+                let saved = JSON.parse(localStorage.getItem('savedAdvice') || '[]');
+                saved.push(currentAdvice);
+                localStorage.setItem('savedAdvice', JSON.stringify(saved));
+                loadSaved();
+                alert('Совет сохранён!');
+                saveBtn.style.display = 'none';
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            localStorage.removeItem('savedAdvice');
+            loadSaved();
+        });
+
+        loadSaved();
+    </script>
+</body>
+</html>
