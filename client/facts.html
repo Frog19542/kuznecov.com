@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Факты о животных</title>
+    <style>
+        body { font-family: system-ui; max-width: 600px; margin: auto; padding: 2rem; }
+        button { padding: 10px 20px; }
+        .fact { background: #e6f7ff; padding: 1rem; border-radius: 10px; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <h1> Случайный факт о животных</h1>
+    <button id="getFact">Показать факт</button>
+    <div class="fact" id="fact">Нажмите кнопку, чтобы получить факт.</div>
+
+    <script>
+        const factDiv = document.getElementById('fact');
+        document.getElementById('getFact').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/proxy.php?url=https://catfact.ninja/fact');
+                const data = await res.json();
+                factDiv.innerHTML = `<p> ${data.fact}</p><small>— длина: ${data.length} символов</small>`;
+            } catch (e) {
+                factDiv.innerHTML = `<p style="color:red;">Ошибка: ${e.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
